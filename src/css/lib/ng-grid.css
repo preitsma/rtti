@@ -122,16 +122,22 @@
   background-color: transparent;
 }
 .ngHeaderText {
-  padding: 5px;
+  padding: 10px 5px 5px 5px;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   -ms-text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
   overflow: hidden;
+  text-align: center;
 }
+
+.colt0 {
+  text-align: right;
+}
+
 .ngHeaderButtonArrow {
   position: absolute;
   top: 4px;
@@ -336,6 +342,7 @@
   top: 0;
   bottom: 0;
   background-color: inherit;
+  text-align: center;
 }
 .ngCell.pinned {
   z-index: 1;

@@ -15,6 +15,7 @@ function userController($scope) {
         totalServerItems: 0, //how many items are on the server (for paging)
         currentPage: 1 //what page they are currently on
     };
+    var rtti = ['R','T1','T2','I']
     self.getPagedDataAsync = function (pageSize, page, searchText) {
         setTimeout(function () {
             self.gettingData = true;
@@ -36,6 +37,11 @@ function userController($scope) {
             self.gettingData = false;
         }, 100);
     };
+
+    self.getRandomNumer =  function (from, to) {
+        return Math.floor(Math.random() * (to - from + 1) + from);
+    };
+
     $scope.$watch('pagingOptions', function () {
         if (!self.poInit || self.gettingData) {
             self.poInit = true;
@@ -53,9 +59,18 @@ function userController($scope) {
     self.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
     
 
-    $scope.myDefs = [{ field: 'name', displayName: 'Naam', width: 200 }];
+    var headerTemp = '<div class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\':col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"> \
+                            <div ng-click="col.sort($event)" ng-class="\'colt\' + col.index" class="ngHeaderText">{{col.displayName.name}}<br/>{{col.displayName.rttiType}}<br/>{{col.displayName.range}}</div> \
+                            <div class="ngSortButtonDown" ng-show="col.showSortButtonDown()"></div><div class="ngSortButtonUp" ng-show="col.showSortButtonUp()"></div> \
+                            <div class="ngSortPriority">{{col.sortPriority}}</div> \
+                            <div ng-class="{ ngPinnedIcon: col.pinned, ngUnPinnedIcon: !col.pinned }" ng-click="togglePin(col)" ng-show="col.pinnable"></div> \
+                     </div> \
+                     <div ng-show="col.resizable" class="ngHeaderGrip" ng-click="col.gripClick($event)" ng-mousedown="col.gripOnMouseDown($event)"></div>';
+
+
+    $scope.myDefs = [{ field: 'name', displayName: { name: 'Opgave', rttiType: "R, T1, T2, I", range: 'Max'}, width: 200, headerCellTemplate : headerTemp }];
     for (var i = 1; i < 20; i++) {
-       $scope.myDefs.push({field: 'opg' + i.toString(), displayName: 'Opg '+ i.toString(), width: 80 }) 
+       $scope.myDefs.push({field: 'opg' + i.toString(), displayName: { name: i.toString(), rttiType: rtti[self.getRandomNumer(0,3)], range: self.getRandomNumer(0,10) }, width: 80, headerCellTemplate : headerTemp }) 
     };
 
     var testData =
@@ -65,15 +80,17 @@ function userController($scope) {
              { name: "Achmed, Cazemier" },
              { name: "Cornelis, Jaap" },
              { name: "Boginskaja, Natalia" },
-             { name: "Kutyr, Sergey"},
-             { name: "Heummen, Satya van"},
-             { name: "Dzmitry, Bushenko"}];
+             { name: "Kutyr, Sergey" },
+             { name: "Heummen, Satya van" },
+             { name: "Dzmitry, Bushenko" }];
 
         $.map(testData, function (val, el) {   
         for (var i = 1; i < 20; i++) {
-            val['opg' + i.toString()] = (Math.floor(Math.random() * 10) + 1);
+            val['opg' + i.toString()] = self.getRandomNumer(0,10);
         } 
      });
+
+
      
 
    
@@ -112,7 +129,7 @@ function userController($scope) {
         enableColumnResize: true,
         enableColumnReordering: true,
         selectedItems: $scope.mySelections,
-        headerRowHeight: 40,
+        headerRowHeight: 70,
         pagingOptions: $scope.pagingOptions,
 		enablePaging: true,
 		enableRowSelection: true,
