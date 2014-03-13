@@ -5,6 +5,7 @@
     <title>ng-grid workbench</title>
     <link rel="stylesheet" type="text/css" href="css/lib/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="css/lib/ng-grid.css" />
+    <link rel="stylesheet" type="text/css" href="css/rtti.css" />
     <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
     <script type="text/javascript" src="js/lib/jquery-ui-1.9.1.custom.min.js"></script>
     <script type="text/javascript" src="js/lib/angular.js"></script>
@@ -32,7 +33,7 @@
 </head>
     <body ng-app="myApp" ng-controller="userController" >
         <div id="parent">
-            <div style="width: 1600px; height: 600px;" class="table"  ng-grid="gridOptions">
+            <div style="position: absolute;  left: 0; right: 0; top: 0; bottom: 0; overflow: hidden" class="gridStyle"  ng-grid="gridOptions">
             </div>    
         </div>
         <div>{{mySelections | json}}</div>

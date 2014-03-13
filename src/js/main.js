@@ -67,32 +67,40 @@ function userController($scope) {
                      </div> \
                      <div ng-show="col.resizable" class="ngHeaderGrip" ng-click="col.gripClick($event)" ng-mousedown="col.gripOnMouseDown($event)"></div>';
 
+    var wizardCell = '<div class="wizardCell" ng-class="col.colIndex()"></div>';
 
     $scope.myDefs = [{ field: 'name', displayName: { name: 'Opgave', rttiType: "R, T1, T2, I", range: 'Max'}, width: 200, headerCellTemplate : headerTemp }];
+    $scope.myDefs.push({ field: 'number', displayName: '', width: 30, cellTemplate : wizardCell, sortable: false, enableCellEdit: false })
     for (var i = 1; i < 20; i++) {
-       $scope.myDefs.push({field: 'opg' + i.toString(), displayName: { name: i.toString(), rttiType: rtti[self.getRandomNumer(0,3)], range: self.getRandomNumer(0,10) }, width: 80, headerCellTemplate : headerTemp }) 
+       $scope.myDefs.push({field: 'opg' + i.toString(), aap: "aap", displayName: { name: i.toString(), rttiType: rtti[self.getRandomNumer(0,3)], range: self.getRandomNumer(0,10) }, width: 50, headerCellTemplate : headerTemp }) 
     };
 
-    var testData =
-            [{ name: "Breemhaar, Frederique" },
-             { name: "Broek, Ron" },
-             { name: "Broeke, Kees" },
-             { name: "Achmed, Cazemier" },
-             { name: "Cornelis, Jaap" },
-             { name: "Boginskaja, Natalia" },
-             { name: "Kutyr, Sergey" },
-             { name: "Heummen, Satya van" },
-             { name: "Dzmitry, Bushenko" }];
+    var testData = [];
+    var leerlingen = 
+      ["Breemhaar, Frederique", 
+       "Broek, Ron",
+       "Broeke, Kees", 
+       "Achmed, Cazemier",
+       "Cornelis, Jaap",
+       "Boginskaja, Svetlana",
+       "Kutyr, Sergey",
+       "Heummen, Satya van",
+       "Dzmitry, Bushenko",
+       "Bouwhuis, Nienke",
+       "Kramer, Sven",
+       "Oosterhof, Elia",
+       "Harks, John",
+       "Dekker, Melissa",
+       "Reitsma, Peter"]; 
 
-        $.map(testData, function (val, el) {   
+    $.map(leerlingen, function (val, number) {   
+        el = {name: val};
+        el['number'] = number;
         for (var i = 1; i < 20; i++) {
-            val['opg' + i.toString()] = self.getRandomNumer(0,10);
+            el['opg' + i.toString()] = self.getRandomNumer(0,10);
         } 
+        testData.push(el);
      });
-
-
-     
-
    
     var myplugin = {
         init: function(scope, grid) {
@@ -126,8 +134,8 @@ function userController($scope) {
 
     $scope.gridOptions = {
         data: 'myData',
-        enableColumnResize: true,
-        enableColumnReordering: true,
+        enableColumnResize: false,
+        enableColumnReordering: false,
         selectedItems: $scope.mySelections,
         headerRowHeight: 70,
         pagingOptions: $scope.pagingOptions,
@@ -135,13 +143,13 @@ function userController($scope) {
 		enableRowSelection: true,
 		multiSelect: false,
         enableRowReordering: false,
-		enablePinning: true,
-		showGroupPanel: true,
+		enablePinning: false,
+		showGroupPanel: false,
 		showFooter: false,
 		showFilter: true,
         enableCellEdit: true,
         enableCellSelection: true,
-        showColumnMenu: true,
+        showColumnMenu: false,
         maintainColumnRatios: true,
         columnDefs: 'myDefs',
         primaryKey: 'id',
