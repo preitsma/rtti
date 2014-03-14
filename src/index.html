@@ -2,44 +2,20 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>ng-grid workbench</title>
+    <title>RTTI Online</title>
     <link rel="stylesheet" type="text/css" href="css/lib/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="css/lib/ng-grid.css" />
     <link rel="stylesheet" type="text/css" href="css/rtti.css" />
-    <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="js/lib/jquery-ui-1.9.1.custom.min.js"></script>
-    <script type="text/javascript" src="js/lib/angular.js"></script>
-    <script type="text/javascript" src="js/lib/bootstrap.js"></script>
-    <script type="text/javascript" src="js/lib/ng-grid.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
-    <script>
-        angular.module('myApp',['ngGrid']);
-    </script>
-    <style type="text/css">
-        .ngRow.selected {
-          color: #ffffff;
-          font-weight: bold;
-          background-color: #76b617;
-          background-image: -webkit-linear-gradient(top, #76b617, #638911);
-          background-image: -moz-linear-gradient(top, #76b617, #638911);
-          background-image: -o-linear-gradient(top, #76b617, #638911);
-          background-image: -ms-linear-gradient(top, #76b617, #638911);
-          background-image: linear-gradient(top, #76b617, #638911);
-          -webkit-border-radius: 4px 4px 4px 4px;
-          -moz-border-radius: 4px 4px 4px 4px;
-          border-radius: 4px 4px 4px 4px;
-        }
-    </style>
 </head>
-    <body ng-app="myApp" ng-controller="userController" >
-        <div id="parent">
-            <div style="position: absolute;  left: 0; right: 0; top: 0; bottom: 0; overflow: hidden" class="gridStyle"  ng-grid="gridOptions">
-            </div>    
-        </div>
-        <div>{{mySelections | json}}</div>
-        <button ng-click="checkData()">Check Data</button>
-        <button ng-click="Add()">Insert Rows</button>
-        <button ng-click="changeLang()">change Language</button>
-        <button ng-click="setSelection()">set Selections</button>
+    <body ng-app="rttiApp">
+        <div ng-view></div>
+         
+        <script type="text/javascript" src="js/lib/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="js/lib/jquery-ui-1.9.1.custom.min.js"></script>
+        <script type="text/javascript" src="js/lib/angular.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap.js"></script>
+        <script type="text/javascript" src="js/lib/ng-grid.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+
     </body>
 </html>

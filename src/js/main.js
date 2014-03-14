@@ -1,23 +1,68 @@
 /// <reference path="../plugins/ng-grid-reorderable.js" />
 /// <reference path="../ng-grid-1.0.0.debug.js" />
-function userController($scope) {
+
+var rttiApp = angular.module('rttiApp', ['ngGrid']);
+
+//Define Routing for app
+//Uri /             -> template grid.html and Controller GridController
+//Uri /wizard       -> template wizard.html and Controller WizardController
+rttiApp.config(['$routeProvider',
+  function($routeProvider) {
+    $routeProvider.
+      when('/', {
+        templateUrl: 'incl/grid.html',
+        controller: 'GridController'
+    }).
+      when('/wizard/:leerlingId', {
+        templateUrl: 'incl/wizard.html',
+        controller: 'WizardController'
+      }).
+      otherwise({
+        redirectTo: '/'
+      });
+}]);
+
+
+rttiApp.controller('GridController', function($scope) {
+    console.log("GridController");
     var self = this;
-    $scope.mySelections = [];
-    $scope.mySelections2 = [];
+    var rtti = ['R','T1','T2','I']
+
     $scope.myData = [];
+    $scope.myDefs = [];
+
+    $scope.gridOptions = {
+        data: 'myData',
+        columnDefs: 'myDefs',
+        enableColumnResize: false,
+        enableColumnReordering: false,
+        selectedItems: $scope.mySelections,
+        headerRowHeight: 70,
+        enablePaging: true,
+        enableRowSelection: true,
+        multiSelect: false,
+        enableRowReordering: false,
+        enablePinning: false,
+        showGroupPanel: false,
+        showFooter: false,
+        showFilter: true,
+        enableCellEdit: true,
+        enableCellSelection: true,
+        showColumnMenu: false,
+        maintainColumnRatios: true,
+        primaryKey: 'id',
+        sortInfo: {fields:['name'], directions:['asc'] }
+    };
+    
+
+  
     $scope.filterOptions = {
         filterText: "",
         useExternalFilter: false
     };
-    $scope.pagingOptions = {
-        pageSizes: [250, 500, 1000], //page Sizes
-        pageSize: 250, //Size of Paging data
-        totalServerItems: 0, //how many items are on the server (for paging)
-        currentPage: 1 //what page they are currently on
-    };
-    var rtti = ['R','T1','T2','I']
-    self.getPagedDataAsync = function (pageSize, page, searchText) {
-        setTimeout(function () {
+ 
+    self.getPagedDataAsync = function (searchText) {
+        //setTimeout(function () {
             self.gettingData = true;
             var data;
             if (searchText) {
@@ -28,35 +73,26 @@ function userController($scope) {
             } else {
                 data = testData;
             }
-            var pagedData = data.slice((page - 1) * pageSize, page * pageSize);
-            $scope.pagingOptions.totalServerItems = data.length;
-            $scope.myData = pagedData;
+            $scope.myData = data;
             if (!$scope.$$phase) {
                 $scope.$apply();
             }
             self.gettingData = false;
-        }, 100);
+        //}, 100);
     };
 
-    self.getRandomNumer =  function (from, to) {
+    $scope.getRandomNumer = function (from, to) {
         return Math.floor(Math.random() * (to - from + 1) + from);
     };
 
-    $scope.$watch('pagingOptions', function () {
-        if (!self.poInit || self.gettingData) {
-            self.poInit = true;
-            return;
-        } 
-        self.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
-    }, true);
     $scope.$watch('filterOptions', function () {
         if (!self.foInit || self.gettingData) {
             self.foInit = true;
             return;
         }
-        self.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage, $scope.filterOptions.filterText);
+        self.getPagedDataAsync($scope.filterOptions.filterText);
     }, true);
-    self.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+
     
 
     var headerTemp = '<div class="ngHeaderSortColumn {{col.headerClass}}" ng-style="{\'cursor\':col.cursor}" ng-class="{ \'ngSorted\': !noSortVisible }"> \
@@ -67,12 +103,14 @@ function userController($scope) {
                      </div> \
                      <div ng-show="col.resizable" class="ngHeaderGrip" ng-click="col.gripClick($event)" ng-mousedown="col.gripOnMouseDown($event)"></div>';
 
-    var wizardCell = '<div class="wizardCell" ng-class="col.colIndex()"></div>';
+    //var wizardCell = '<div class="wizardCell" ng-class="col.colIndex()"><a href="/#wizard/{{row.getProperty(col.field)}}"></a></div>';
+     var wizardCell = '<a href="/#wizard/{{row.getProperty(col.field)}}"><div class="wizardCell" ng-class="col.colIndex()"></div></a>';
+
 
     $scope.myDefs = [{ field: 'name', displayName: { name: 'Opgave', rttiType: "R, T1, T2, I", range: 'Max'}, width: 200, headerCellTemplate : headerTemp }];
     $scope.myDefs.push({ field: 'number', displayName: '', width: 30, cellTemplate : wizardCell, sortable: false, enableCellEdit: false })
     for (var i = 1; i < 20; i++) {
-       $scope.myDefs.push({field: 'opg' + i.toString(), aap: "aap", displayName: { name: i.toString(), rttiType: rtti[self.getRandomNumer(0,3)], range: self.getRandomNumer(0,10) }, width: 50, headerCellTemplate : headerTemp }) 
+       $scope.myDefs.push({field: 'opg' + i.toString(), aap: "aap", displayName: { name: i.toString(), rttiType: rtti[$scope.getRandomNumer(0,3)], range: $scope.getRandomNumer(0,10) }, width: 50, headerCellTemplate : headerTemp }) 
     };
 
     var testData = [];
@@ -97,64 +135,15 @@ function userController($scope) {
         el = {name: val};
         el['number'] = number;
         for (var i = 1; i < 20; i++) {
-            el['opg' + i.toString()] = self.getRandomNumer(0,10);
+            el['opg' + i.toString()] = $scope.getRandomNumer(0,10);
         } 
         testData.push(el);
      });
-   
-    var myplugin = {
-        init: function(scope, grid) {
-            myplugin.scope = scope;
-            myplugin.grid = grid;
-            $scope.$watch(function () {
-                var searchQuery = "";
-                angular.forEach(myplugin.scope.columns, function (col) {
-                    if (col.filterText) {
-                        searchQuery += col.field + ": " + col.filterText + "; ";
-                    }
-                });
-                return searchQuery;
-            }, function (searchQuery) {
-                myplugin.scope.$parent.filterText = searchQuery;
-                myplugin.grid.searchProvider.evalFilter();
-            });
-        },
-        scope: undefined,
-        grid: undefined
+
+    $scope.testme = function (number) {
+        alert('starten die wizard numer ' + number );
     };
 
-    $scope.myDefs2 = [{ field: 'Sku', displayName: 'My Sku', enableCellEdit: true },
-        { field: 'Vendor', displayName: 'Supplier', enableCellEdit: true },
-        { field: 'SeasonCode', displayName: 'My SeasonCode', enableCellEdit: true },
-        { field: 'Mfg_Id', displayName: 'Manufacturer ID', enableCellEdit: true },
-        { field: 'UPC', displayName: 'Bar Code', enableCellEdit: true }];
-    self.selectionchanging = function (a, b) {
-        return true;
-    };
-
-    $scope.gridOptions = {
-        data: 'myData',
-        enableColumnResize: false,
-        enableColumnReordering: false,
-        selectedItems: $scope.mySelections,
-        headerRowHeight: 70,
-        pagingOptions: $scope.pagingOptions,
-		enablePaging: true,
-		enableRowSelection: true,
-		multiSelect: false,
-        enableRowReordering: false,
-		enablePinning: false,
-		showGroupPanel: false,
-		showFooter: false,
-		showFilter: true,
-        enableCellEdit: true,
-        enableCellSelection: true,
-        showColumnMenu: false,
-        maintainColumnRatios: true,
-        columnDefs: 'myDefs',
-        primaryKey: 'id',
-        sortInfo: {fields:['name'], directions:['asc'] }
-    };
     $scope.doStuff = function (evt) {
         var elm = angular.element(evt.currentTarget.parentNode);
         elm.on('change', function() {
@@ -162,84 +151,13 @@ function userController($scope) {
             scope.$parent.isFocused = false;
         });
     };
-    $scope.myData2 = [{ 'Sku': 'C-2820164', 'Vendor': 'NEWB', 'SeasonCode': null, 'Mfg_Id': '573-9880954', 'UPC': '822860449228' },
-                      { 'Sku': 'J-8555462', 'Vendor': 'NIKE', 'SeasonCode': '', 'Mfg_Id': '780-8855467', 'UPC': '043208523549' },
-                      { 'Sku': 'K-5312708', 'Vendor': 'REEB', 'SeasonCode': '1293', 'Mfg_Id': '355-6906843', 'UPC': '229487568922' },
-                      { 'Sku': 'W-4295255', 'Vendor': 'REEB', 'SeasonCode': '6283', 'Mfg_Id': '861-4929378', 'UPC': '644134774391' },
-                      { 'Sku': 'X-9829445', 'Vendor': 'DOCK', 'SeasonCode': '6670', 'Mfg_Id': '298-5235913', 'UPC': '872941679110' },
-                      { 'Sku': 'H-2415929', 'Vendor': 'REEB', 'SeasonCode': '3884', 'Mfg_Id': '615-8231520', 'UPC': '310547300561' },
-                      { 'Sku': 'X-2718366', 'Vendor': 'MERR', 'SeasonCode': '4054', 'Mfg_Id': '920-2961971', 'UPC': '157891269493' },
-                      { 'Sku': 'Q-1505237', 'Vendor': 'AX', 'SeasonCode': '9145', 'Mfg_Id': '371-6918101', 'UPC': '553657492213' },
-                      { 'Sku': 'M-1626429', 'Vendor': 'REEB', 'SeasonCode': '1846', 'Mfg_Id': '242-5856618', 'UPC': '029388467459' },
-                      { 'Sku': 'Y-1914652', 'Vendor': 'LEVI', 'SeasonCode': '5553', 'Mfg_Id': '80-9194110', 'UPC': '433360049369' }];
-    $scope.gridOptions2 = {
-        data: 'myData2',
-        selectedItems: $scope.mySelections2,
-        beforeSelectionChange: self.selectionchanging,
-        showFilter: true,
-        multiSelect: true,
-        columnDefs: 'myDefs2',
-        enablePinning: true,
-        groupsCollapsedByDefault: false
-    };
-    $scope.changeData = function () {
-        $scope.myData2.pop();
-    };
-    $scope.changeLang = function () {
-        $scope.gridOptions.i18n = 'ge';
-    };
-    $scope.spliceData = function () {
-        var temp = $scope.myData2;
-        temp.splice(0, 0, { 'Sku': 'Y-1914652', 'Vendor': 'LEVI', 'SeasonCode': '5553', 'Mfg_Id': '80-9194110', 'UPC': '433360049369' });
-        $scope.myData2 = temp;
-    };
-    $scope.resetData = function () {
-        $scope.myData2 = [{ 'Sku': 'C-2820164', 'Vendor': 'NEWB', 'SeasonCode': null, 'Mfg_Id': '573-9880954', 'UPC': '822860449228' },
-                      { 'Sku': 'J-8555462', 'Vendor': 'NIKE', 'SeasonCode': '', 'Mfg_Id': '780-8855467', 'UPC': '043208523549' },
-                      { 'Sku': 'K-5312708', 'Vendor': 'REEB', 'SeasonCode': '1293', 'Mfg_Id': '355-6906843', 'UPC': '229487568922' },
-                      { 'Sku': 'W-4295255', 'Vendor': 'REEB', 'SeasonCode': '6283', 'Mfg_Id': '861-4929378', 'UPC': '644134774391' },
-                      { 'Sku': 'X-9829445', 'Vendor': 'DOCK', 'SeasonCode': '6670', 'Mfg_Id': '298-5235913', 'UPC': '872941679110' },
-                      { 'Sku': 'H-2415929', 'Vendor': 'REEB', 'SeasonCode': '3884', 'Mfg_Id': '615-8231520', 'UPC': '310547300561' },
-                      { 'Sku': 'X-2718366', 'Vendor': 'MERR', 'SeasonCode': '4054', 'Mfg_Id': '920-2961971', 'UPC': '157891269493' },
-                      { 'Sku': 'Q-1505237', 'Vendor': 'AX', 'SeasonCode': '9145', 'Mfg_Id': '371-6918101', 'UPC': '553657492213' },
-                      { 'Sku': 'M-1626429', 'Vendor': 'REEB', 'SeasonCode': '1846', 'Mfg_Id': '242-5856618', 'UPC': '029388467459' },
-                      { 'Sku': 'Y-1914652', 'Vendor': 'LEVI', 'SeasonCode': '5553', 'Mfg_Id': '80-9194110', 'UPC': '433360049369' }];;
-    };
-	$scope.modifyData = function(){
-		$scope.myData2[0].Vendor = "HELLO";
-	};
 
+    self.getPagedDataAsync($scope.filterOptions.filterText);
+  
+});
 
-	$scope.myData3 = [{ 'Sku': 'C-2820164', 'Vendor': {'name':'NIKE'}, 'SeasonCode': null, 'Mfg_Id': '573-9880954', 'UPC': '822860449228' },
-				  { 'Sku': 'J-8555462', 'Vendor': {'name':'NIKE'}, 'SeasonCode': '', 'Mfg_Id': '780-8855467', 'UPC': '043208523549' },
-				  { 'Sku': 'K-5312708', 'Vendor': {'name':'NIKE'}, 'SeasonCode': '1293', 'Mfg_Id': '355-6906843', 'UPC': '229487568922' },
-				  { 'Sku': 'W-4295255', 'Vendor': {'name':'NIKE'}, 'SeasonCode': '6283', 'Mfg_Id': '861-4929378', 'UPC': '644134774391' },
-				  { 'Sku': 'X-9829445', 'Vendor': {'name':'NIKE'}, 'SeasonCode': '6670', 'Mfg_Id': '298-5235913', 'UPC': '872941679110' },
-				  { 'Sku': 'H-2415929', 'Vendor': {'name':'REEB'}, 'SeasonCode': '3884', 'Mfg_Id': '615-8231520', 'UPC': '310547300561' },
-				  { 'Sku': 'X-2718366', 'Vendor': {'name':'REEB'}, 'SeasonCode': '4054', 'Mfg_Id': '920-2961971', 'UPC': '157891269493' },
-				  { 'Sku': 'Q-1505237', 'Vendor': {'name':'REEB'}, 'SeasonCode': '9145', 'Mfg_Id': '371-6918101', 'UPC': '553657492213' },
-				  { 'Sku': 'M-1626429', 'Vendor': {'name':'REEB'}, 'SeasonCode': '1846', 'Mfg_Id': '242-5856618', 'UPC': '029388467459' },
-				  { 'Sku': 'Y-1914652', 'Vendor': {'name':'REEB'}, 'SeasonCode': '5553', 'Mfg_Id': '80-9194110', 'UPC': '433360049369' }];
-				  
-    $scope.myDefs3 = [{ field: 'Sku', displayName: 'My Sku' },
-        { field: 'Vendor.name', displayName: 'Supplier', cellFilter: 'branding' },
-        { field: 'SeasonCode', displayName: 'My SeasonCode', cellTemplate: '<input style="width:100%;height:100%;" class="ui-widget input" type="text" ng-readonly="!row.selected" ng-model="row.entity[col.field]"/>' },
-        { field: 'Mfg_Id', displayName: 'Manufacturer ID' },
-        { field: 'UPC', displayName: 'Bar Code' }];
-		
-	$scope.filteringText = '';
-    $scope.gridOptions3 = {
-        data: 'myData3',
-        multiSelect: false,
-		filterOptions: {filterText:'filteringText', useExternalFilter: false},
-        columnDefs: 'myDefs3'
-    };
-	
-	$scope.$on('filterChanged', function(evt, text){
-		$scope.filteringText = text;
-	});
-    $scope.setSelection = function() {
-        $scope.gridOptions2.selectRow(0, true);
-    };
-    $scope.dropDownOpts = ['editing', 'is', 'impossibru?'];
-};
+rttiApp.controller('WizardController', function($scope) {
+ 
+    $scope.message = 'This is Wizard screen';
+ 
+});
