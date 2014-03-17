@@ -194,28 +194,29 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
 
 rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, proefwerk, leerling) {
  
+    var self = this;
+
     $log.log(leerling);
    
     $scope.proefwerk = proefwerk;
     $scope.leerling = leerling;
+    $scope.uitslag = [];
 
     $scope.numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-
-    $scope.counter = 0;
-    $scope.currentVraag = proefwerk[$scope.counter];
-
-    $scope.radioModel = '3';
+  
+    $scope.enter = function(number) {
+        $scope.uitslag[$scope.counter] = number;
+        $scope.next();
+    }
 
     $scope.next = function() { 
-
-
-        $scope.currentVraag = proefwerk[$scope.counter++];
-        $log.log($scope.counter);
-        $log.log($scope.currentVraag);
+        $scope.counter++;
+        self.update(); 
     }
 
     $scope.previous = function() {
-        $scope.currentVraag = proefwerk[$scope.counter--];
+        $scope.counter--;
+        self.update();        
     }
 
     $scope.ok = function () {
@@ -225,6 +226,15 @@ rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, p
     $scope.cancel = function () {
        $modalInstance.dismiss();
     };
+
+    self.update = function() {
+        $scope.currentVraag = proefwerk[$scope.counter];
+        $scope.radioModel = $scope.uitslag[$scope.counter];
+
+    }
+
+    $scope.counter = 0;
+    self.update();
  
 });
 

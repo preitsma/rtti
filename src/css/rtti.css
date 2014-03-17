@@ -5,15 +5,27 @@
 }
 
 .ngRow.selected {
-          color: #ffffff;
-          font-weight: bold;
-          background-color: #76b617;
-          background-image: -webkit-linear-gradient(top, #76b617, #638911);
-          background-image: -moz-linear-gradient(top, #76b617, #638911);
-          background-image: -o-linear-gradient(top, #76b617, #638911);
-          background-image: -ms-linear-gradient(top, #76b617, #638911);
-          background-image: linear-gradient(top, #76b617, #638911);
-          -webkit-border-radius: 4px 4px 4px 4px;
-          -moz-border-radius: 4px 4px 4px 4px;
-          border-radius: 4px 4px 4px 4px;
+    color: #ffffff;
+    font-weight: bold;
+    background-color: #76b617;
+    background-image: -webkit-linear-gradient(top, #76b617, #638911);
+    background-image: -moz-linear-gradient(top, #76b617, #638911);
+    background-image: -o-linear-gradient(top, #76b617, #638911);
+    background-image: -ms-linear-gradient(top, #76b617, #638911);
+    background-image: linear-gradient(top, #76b617, #638911);
+    -webkit-border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px 4px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
+}
+
+.btn-big {
+    width: 50px;
+    margin: 10px;
+    font-size: 24px;
+}
+
+@media (min-width: 768px) {
+   .modal-dialog {
+    width: 800px;
+}
 }

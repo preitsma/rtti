@@ -2,17 +2,14 @@
         <div class="modal-header">
            <h3>{{leerling.naam}}</h3>
         </div>
-        <div class="modal-body" >
-        	<h3>Vraag {{ currentVraag.id }}</h3>
-            <h4>rrti: {{ currentVraag.rtti }}</h4>
-
+        <div class="modal-body">
+        	<h3>Vraag {{ currentVraag.id }}-rrti: {{ currentVraag.rtti }}</h3>
+            <h4>radiomodel: {{radioModel}} - counter: {{counter}}</h4>
             <div class="btn-group" data-ng-repeat="i in numbers | limitTo:(currentVraag.max+1)">
-                 <button type="button" class="btn btn-primary" ng-model="radioModel" btn-radio="$index" >{{$index}}</button>
+                 <button type="button" class="btn btn-default" ng-class="{active: $index==radioModel}" btn-radio="$index">{{$index}} </button>
             </div ng-repeat-end>
-            noot
         </div>
         <div class="modal-footer">
         	<div class="pull-left"><button class="btn btn-warning" ng-click="previous()">Vorige</button></div>
             <div class="pull-right"><button class="btn btn-primary" ng-click="next()">Volgende</button></div>
-            <!-- <button class="btn btn-warning" ng-click="cancel()">Cancel</button> -->
         </div>
