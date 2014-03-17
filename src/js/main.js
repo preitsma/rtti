@@ -1,13 +1,12 @@
 /// <reference path="../plugins/ng-grid-reorderable.js" />
 /// <reference path="../ng-grid-1.0.0.debug.js" />
 
-var rttiApp = angular.module('rttiApp', ['ngGrid']);
+var rttiApp = angular.module('rttiApp', ['ngGrid', 'ui.bootstrap']);
 
 //Define Routing for app
 //Uri /             -> template grid.html and Controller GridController
 //Uri /wizard       -> template wizard.html and Controller WizardController
-rttiApp.config(['$routeProvider',
-  function($routeProvider) {
+rttiApp.config(function($routeProvider) {
     $routeProvider.
       when('/', {
         templateUrl: 'incl/grid.html',
@@ -20,9 +19,9 @@ rttiApp.config(['$routeProvider',
       otherwise({
         redirectTo: '/'
       });
-}]);
+});
 
-rttiApp.factory('dataFactory', ['$http', function($http) {
+rttiApp.factory('dataFactory', function($http) {
 
    var urlBase = '/api';
    var dataFactory = {};
@@ -37,10 +36,10 @@ rttiApp.factory('dataFactory', ['$http', function($http) {
 
    return dataFactory;
 
-}]);
+});
 
 
-rttiApp.controller('GridController', ['$scope', 'dataFactory', function($scope, dataFactory) {
+rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory) {
     var self = this;
     var rtti = ['R','T1','T2','I']
 
@@ -53,10 +52,13 @@ rttiApp.controller('GridController', ['$scope', 'dataFactory', function($scope, 
                      <div ng-show="col.resizable" class="ngHeaderGrip" ng-click="col.gripClick($event)" ng-mousedown="col.gripOnMouseDown($event)"></div>';
 
     //var wizardCell = '<div class="wizardCell" ng-class="col.colIndex()"><a href="/#wizard/{{row.getProperty(col.field)}}"></a></div>';
-     var wizardCell = '<a href="/#wizard/{{row.getProperty(col.field)}}"><div class="wizardCell" ng-class="col.colIndex()"></div></a>';
+    // var wizardCell = '<a href="/#wizard/{{row.getProperty(col.field)}}"><div class="wizardCell" ng-class="col.colIndex()"></div></a>';
+    var wizardCell = '<div class="wizardCell" ng-class="col.colIndex()" ng-click="startWizard(row.getProperty(col.field))"></div>';
 
 
     $scope.myData = [];
+    $scope.klas;
+    $scope.proefwerk;
 
     $scope.myDefs = [{ field: 'name', displayName: { name: 'Opgave', rttiType: "R, T1, T2, I", range: 'Max'}, width: 200, headerCellTemplate : headerTemp }];
     $scope.myDefs.push({ field: 'number', displayName: '', width: 30, cellTemplate : wizardCell, sortable: false, enableCellEdit: false });
@@ -113,7 +115,7 @@ rttiApp.controller('GridController', ['$scope', 'dataFactory', function($scope, 
          //get the klas
          dataFactory.getKlas()
             .success(function (klas) {
-                   
+                  $scope.klas = klas;
                   //fill the testData with numbers for every opgave 
                   $.map(klas, function (leerlingEl, number) {   
                       row = {name: leerlingEl.naam, number: leerlingEl.id}
@@ -134,6 +136,7 @@ rttiApp.controller('GridController', ['$scope', 'dataFactory', function($scope, 
 
         dataFactory.getProefwerk()
              .success(function (proefwerk) {
+                 $scope.proefwerk = proefwerk;
                  //fill definitions with proefwerk vragen
                  $.map(proefwerk, function(vraagEl) { 
                     $scope.myDefs.push({field: 'opg' + vraagEl.id, displayName: { name: vraagEl.id, rttiType: vraagEl.rtti, range: vraagEl.max }, width: 50, headerCellTemplate : headerTemp })                     
@@ -149,6 +152,23 @@ rttiApp.controller('GridController', ['$scope', 'dataFactory', function($scope, 
     }
 
     self.getData();
+
+    $scope.startWizard = function (leerlingId) {
+      $log.log("Klas:" + $scope.klas);
+
+      var modalInstance = $modal.open({
+        templateUrl: 'incl/wizard.html',
+        controller: 'ModalInstanceCtrl',
+        resolve: {
+          proefwerk: function () {
+             return $scope.proefwerk;
+          }, 
+          leerling: function() {
+             return $.grep($scope.klas, function(e) { return e.id === leerlingId})[0];
+          }
+        }
+      })
+     };
 
     $scope.getRandomNumer = function (from, to) {
         return Math.floor(Math.random() * (to - from + 1) + from);
@@ -170,10 +190,43 @@ rttiApp.controller('GridController', ['$scope', 'dataFactory', function($scope, 
         });
     };
   
-}]);
+});
 
-rttiApp.controller('WizardController', function($scope) {
+rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, proefwerk, leerling) {
  
-    $scope.message = 'This is Wizard screen';
+    $log.log(leerling);
+   
+    $scope.proefwerk = proefwerk;
+    $scope.leerling = leerling;
+
+    $scope.numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+
+    $scope.counter = 0;
+    $scope.currentVraag = proefwerk[$scope.counter];
+
+    $scope.radioModel = '3';
+
+    $scope.next = function() { 
+
+
+        $scope.currentVraag = proefwerk[$scope.counter++];
+        $log.log($scope.counter);
+        $log.log($scope.currentVraag);
+    }
+
+    $scope.previous = function() {
+        $scope.currentVraag = proefwerk[$scope.counter--];
+    }
+
+    $scope.ok = function () {
+       $modalInstance.close();
+    };
+
+    $scope.cancel = function () {
+       $modalInstance.dismiss();
+    };
  
 });
+
+
+
