@@ -1,3 +1,4 @@
+    <div>    
         <div class="modal-header clearfix"> 
 	        	<div class="col-md-6">
 	                <h1>Vraag {{ proefwerk[counter].id }}/{{proefwerk.length}}</h1> 
@@ -9,13 +10,21 @@
 	            </div>
         </div>
         <div class="modal-body">  
-            <em>Wat is de score?</em><br/>     	
+            <em>Wat is de score?</em><br/>   
+            <div class="row">
+            <div class="col-xs-2">
+               <input class="form-control input-lg" type="text" tab-index="0" ng-model="uitslag[counter+1]" select-on-click>
+            </div>
+            </div>  	
             <div class="btn-group" data-ng-repeat="i in numbers | limitTo:(proefwerk[counter].max+1)">
                  <button type="button" class="btn btn-default btn-big"  ng-model="uitslag[counter+1]" btn-radio="$index">{{$index}}</button>
             </div ng-repeat-end>
+           
         </div>
         <div class="modal-footer">
-        	<div class="pull-left"><button class="btn btn-primary" ng-disabled="counter <= 0"  ng-click="previous();">Vorige</button></div>
-        	<div class="pull-left" ng-if="counter < proefwerk.length"><button class="btn btn-primary" ng-disabled="counter >= (proefwerk.length-1)" ng-click="next();">Volgende</button></div>
+        	<div class="pull-left"><button class="btn btn-primary" ng-disabled="counter <= 0" ng-click="previous();" ng-shortcut="'left'" ng-shortcut-click>Vorige</button></div>
+        	<div class="pull-left" ng-if="counter < proefwerk.length"><button class="btn btn-primary" ng-disabled="counter >= (proefwerk.length-1)" ng-click="next();" ng-shortcut="'right'"
+            ng-shortcut-click>Volgende</button></div>
         	<div class="pull-right" ng-if="counter == (proefwerk.length-1)"><button class="btn btn-primary" ng-click="ok();">Klaar</button></div>
         </div>
+     </div>
