@@ -120,7 +120,7 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
                   $.map(klas, function (leerlingEl, number) {   
                       row = {name: leerlingEl.naam, number: leerlingEl.id}
                       $.map(proefwerk, function(vraagEl) { 
-                         row['opg' + vraagEl.id] = "-";
+                         row[vraagEl.id] = "0";
                       });
                       $scope.myData.push(row);
                   });
@@ -139,7 +139,7 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
                  $scope.proefwerk = proefwerk;
                  //fill definitions with proefwerk vragen
                  $.map(proefwerk, function(vraagEl) { 
-                    $scope.myDefs.push({field: 'opg' + vraagEl.id, displayName: { name: vraagEl.id, rttiType: vraagEl.rtti, range: vraagEl.max }, width: 50, headerCellTemplate : headerTemp })                     
+                    $scope.myDefs.push({field: vraagEl.id, displayName: { name: vraagEl.id, rttiType: vraagEl.rtti, range: vraagEl.max }, width: 50, headerCellTemplate : headerTemp })                     
                  });
 
                  self.getKlas(proefwerk);   
@@ -154,20 +154,18 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
     self.getData();
 
     $scope.startWizard = function (leerlingId) {
-      $log.log("Klas:" + $scope.klas);
-
+ 
       var modalInstance = $modal.open({
         templateUrl: 'incl/wizard.html',
+        scope: $scope,
         controller: 'ModalInstanceCtrl',
         resolve: {
-          proefwerk: function () {
-             return $scope.proefwerk;
-          }, 
           leerling: function() {
              return $.grep($scope.klas, function(e) { return e.id === leerlingId})[0];
           }
         }
       })
+
      };
 
     $scope.getRandomNumer = function (from, to) {
@@ -192,32 +190,27 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
   
 });
 
-rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, proefwerk, leerling) {
+rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, leerling) {
  
     var self = this;
-
-    $log.log(leerling);
    
-    $scope.proefwerk = proefwerk;
     $scope.leerling = leerling;
-    $scope.uitslag = [];
+    row = $scope.myData.filter( function (el) {return el.number == leerling.id})[0];
+    $.map($scope.proefwerk, function(el) { row[el.id] = parseInt(row[el.id]) })
 
+    $scope.uitslag = row;
+
+ 
     $scope.numbers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+    $scope.counter = 0;
   
-    $scope.enter = function(number) {
-        $scope.uitslag[$scope.counter] = number;
-        $scope.next();
-    }
 
-    $scope.next = function(radioModel) { 
-        $log.log("radio:" + radioModel);
+    $scope.next = function() { 
         $scope.counter++;
-        self.update(); 
     }
 
     $scope.previous = function() {
-        $scope.counter--;
-        self.update();        
+        $scope.counter--;    
     }
 
     $scope.ok = function () {
@@ -227,14 +220,6 @@ rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, p
     $scope.cancel = function () {
        $modalInstance.dismiss();
     };
-
-    self.update = function() {
-        $scope.currentVraag = proefwerk[$scope.counter];
-        $log.log($scope.uitslag);
-    }
-
-    $scope.counter = 0;
-    self.update();
  
 });
 

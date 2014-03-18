@@ -34,6 +34,10 @@
   float: right;
 }
 
+.ngRow.selected {
+  color: #000;
+}
+
 @media (min-width: 768px) {
    .modal-dialog {
     width: 900px;

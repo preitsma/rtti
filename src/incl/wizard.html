@@ -1,19 +1,21 @@
-        <div class="modal-header row"> 
+        <div class="modal-header clearfix"> 
 	        	<div class="col-md-6">
-	                <h1>Vraag {{ proefwerk[counter].id }} <small>{{ proefwerk[counter].rtti }}</small></h1>
+	                <h1>Vraag {{ proefwerk[counter].id }}/{{proefwerk.length}}</h1> 
+	                <em>type: {{ proefwerk[counter].rtti }}, maximale score: {{ proefwerk[counter].max }} </em>
 	            </div>
 	            <div class="col-md-6">
-	            		<div class="pull-right "><button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button></div>
+	            	<div class="pull-right "><button type="button" class="close" ng-click="cancel()" aria-hidden="true">&times;</button></div>
 	                <h1>{{leerling.naam}}</h1>
 	            </div>
         </div>
         <div class="modal-body">  
             <em>Wat is de score?</em><br/>     	
-            <div class="btn-group" data-ng-repeat="i in numbers | limitTo:(currentVraag.max+1)">
-                 <button type="button" class="btn btn-default btn-big"  ng-model="uitslag[counter]" btn-radio="$index">{{$index}}</button>
+            <div class="btn-group" data-ng-repeat="i in numbers | limitTo:(proefwerk[counter].max+1)">
+                 <button type="button" class="btn btn-default btn-big"  ng-model="uitslag[counter+1]" btn-radio="$index">{{$index}}</button>
             </div ng-repeat-end>
         </div>
         <div class="modal-footer">
-        	<div class="pull-left"><button class="btn btn-warning" ng-disabled="counter <= 0"  ng-click="previous();">Vorige</button></div>
-            <div class="pull-right"><button class="btn btn-primary" ng-disabled="counter => proefwerk.length" ng-click="next();">Volgende</button></div>
+        	<div class="pull-left"><button class="btn btn-primary" ng-disabled="counter <= 0"  ng-click="previous();">Vorige</button></div>
+        	<div class="pull-left" ng-if="counter < proefwerk.length"><button class="btn btn-primary" ng-disabled="counter >= (proefwerk.length-1)" ng-click="next();">Volgende</button></div>
+        	<div class="pull-right" ng-if="counter == (proefwerk.length-1)"><button class="btn btn-primary" ng-click="ok();">Klaar</button></div>
         </div>
