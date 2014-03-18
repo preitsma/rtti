@@ -202,14 +202,15 @@ rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, p
     $scope.leerling = leerling;
     $scope.uitslag = [];
 
-    $scope.numbers = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+    $scope.numbers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
   
     $scope.enter = function(number) {
         $scope.uitslag[$scope.counter] = number;
         $scope.next();
     }
 
-    $scope.next = function() { 
+    $scope.next = function(radioModel) { 
+        $log.log("radio:" + radioModel);
         $scope.counter++;
         self.update(); 
     }
@@ -229,8 +230,7 @@ rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, p
 
     self.update = function() {
         $scope.currentVraag = proefwerk[$scope.counter];
-        $scope.radioModel = $scope.uitslag[$scope.counter];
-
+        $log.log($scope.uitslag);
     }
 
     $scope.counter = 0;

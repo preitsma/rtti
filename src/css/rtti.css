@@ -24,8 +24,18 @@
     font-size: 24px;
 }
 
+.first-column {
+  width: 40%;
+  float: left;
+}
+
+.second-column {
+  width: 40%;
+  float: right;
+}
+
 @media (min-width: 768px) {
    .modal-dialog {
-    width: 800px;
+    width: 900px;
 }
 }
