@@ -1,7 +1,7 @@
 /// <reference path="../plugins/ng-grid-reorderable.js" />
 /// <reference path="../ng-grid-1.0.0.debug.js" />
 
-var rttiApp = angular.module('rttiApp', ['ngGrid', 'ui.bootstrap']);
+var rttiApp = angular.module('rttiApp', ['ngGrid', 'ngRoute', 'ui.bootstrap', 'angular-carousel']);
 
 //Define Routing for app
 //Uri /             -> template grid.html and Controller GridController
@@ -39,7 +39,7 @@ rttiApp.factory('dataFactory', function($http) {
 });
 
 
-rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory) {
+rttiApp.controller('GridController', function($scope, $log, $modal, $timeout, dataFactory) {
     var self = this;
     var rtti = ['R','T1','T2','I']
 
@@ -58,7 +58,7 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
 
     $scope.myData = [];
     $scope.klas;
-    $scope.proefwerk;
+    $scope.proefwerk = [];
 
     $scope.myDefs = [{ field: 'name', displayName: { name: 'Opgave', rttiType: "R, T1, T2, I", range: 'Max'}, width: 200, headerCellTemplate : headerTemp }];
     $scope.myDefs.push({ field: 'number', displayName: '', width: 30, cellTemplate : wizardCell, sortable: false, enableCellEdit: false });
@@ -190,7 +190,7 @@ rttiApp.controller('GridController', function($scope, $log, $modal, dataFactory)
   
 });
 
-rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, leerling) {
+rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $timeout, $modalInstance, leerling) {
  
     var self = this;
    
@@ -204,13 +204,22 @@ rttiApp.controller('ModalInstanceCtrl', function($scope, $log, $modalInstance, l
     $scope.numbers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     $scope.counter = 0;
   
+    $scope.slides = [{id: 5, vraag: 4, max: 10},{id: 6, vraag: 4, max: 10}];
 
     $scope.next = function() { 
+        
         if($scope.proefwerk.length > $scope.counter) $scope.counter++;
+        console.log("next:" + $scope.counter);
+        $timeout(function() {
+           $scope.$broadcast('focus' + $scope.counter); 
+        },400);
     }
 
     $scope.previous = function() {
-        if($scope.counter > 0) $scope.counter--;    
+        if($scope.counter > 0) $scope.counter--;   
+        $timeout(function() {
+           $scope.$broadcast('focus' + $scope.counter); 
+        },400);
     }
 
     $scope.ok = function () {
@@ -456,6 +465,23 @@ rttiApp.directive('ngShortcut', [
          });
        };
     });
+
+   rttiApp.directive('focusMe', function($timeout) {
+  return {
+    link: function(scope, element, attrs) {
+      scope.$watch(attrs.focusMe, function(value) {
+        if(value === true) { 
+          console.log('value=',value);
+          $timeout(function() {
+            element[0].focus();
+            element[0].select();
+            scope[attrs.focusMe] = false;
+          });
+        }
+      });
+    }
+  };
+});
 
 
 

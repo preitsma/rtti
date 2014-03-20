@@ -18,6 +18,15 @@
     border-radius: 4px 4px 4px 4px;
 }
 
+.input-big {
+  height: 140px;
+  padding: 10px 16px;
+  font-size: 96px;
+  line-height: 1.33;
+  border-radius: 6px;
+  width: 150px;
+}
+
 .btn-big {
     width: 50px;
     margin: 10px;
@@ -36,6 +45,11 @@
 
 .ngRow.selected {
   color: #000;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
 }
 
 @media (min-width: 768px) {
